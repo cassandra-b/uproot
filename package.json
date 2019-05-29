@@ -1,0 +1,16 @@
+{
+  "name": "stemmer",
+  "version": "0.1.0",
+  "main": "electron-main.js",
+  "scripts": {
+    "build": "bsb -make-world && parcel build --public-url . src/index.html",
+    "clean": "bsb -clean && parcel clean",
+    "start": "bsb -make-world && parcel build --public-url . src/index.html && electron ."
+  },
+  "devDependencies": {
+    "bs-platform": "^5.0.4",
+    "bsb-js": "^1.1.7",
+    "electron": "^5.0.2",
+    "parcel-bundler": "^1.12.3"
+  }
+}

@@ -1,23 +1,8 @@
-*.annot
-*.cmo
-*.cma
-*.cmi
-*.a
-*.o
-*.cmx
-*.cmxs
-*.cmxa
+.*
+!.gitignore
 
-# ocamlbuild working directory
-_build/
+*.bs.js
 
-# ocamlbuild targets
-*.byte
-*.native
-
-# oasis generated files
-setup.data
-setup.log
-
-# Merlin configuring file for Vim and Emacs
-.merlin
+dist/
+lib/
+node_modules/
