@@ -57,7 +57,7 @@ let rec draw : component -> Dom.element = function
       addClass (getClassList ele) (string_of_layout layout);
       List.iter (fun e -> appendChild ele (draw e)) cs;
       ele
-  | HelpText(color, size, altText, text) ->
+  | HelpText(color, size, text, altText) ->
       let ele = createElement "span" in
       addClass (getClassList ele) "help";
       let sty = getStyles ele in
