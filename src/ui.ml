@@ -33,10 +33,12 @@ type size = float
 
 type width = float
 
+type help = string
+
 type component
   = BorderBox of color * width * component
   | Box of layout * component list
-  | HelpText of color * size * string * string
+  | HelpText of color * size * string * help
   | Space of float
   | Text of color * size * string
 
@@ -118,7 +120,6 @@ let () =
                 | Some stack -> Box(Vert, [msg; error stack])
                 | None -> msg
               end
-            | Utils.NotInDict -> error "Word not found in dictionary"
             | exc -> error (Printexc.to_string exc)
           in update c ui)
       | None -> failwith "No #text element!"

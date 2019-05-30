@@ -45,8 +45,22 @@ module type LANGUAGE = sig
   val morpheme_def : morpheme -> text_chunk list
 
   (** Gets the color a morpheme should be displayed in. *)
-  val color_of_morpheme : morpheme -> Color.t
+  val morpheme_color : morpheme -> Color.t
 
   (** Provides a rough translation of a verb. *)
   val translate : (string * morpheme) list -> translation_result
+end
+
+module Pirate : LANGUAGE = struct
+  type morpheme = Arrr
+
+  let stem_verb = function
+    | "Arrr" -> [("Arrr", Arrr)]
+    | _ -> []
+
+  let morpheme_def Arrr = [Plain "Arrrn't you glad I didn't say orange"]
+
+  let morpheme_color Arrr = Color.get 0
+
+  let translate _ = WordNotFound
 end
