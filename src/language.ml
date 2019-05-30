@@ -31,11 +31,12 @@ module type LANGUAGE = sig
 
   (** Breaks a verb up into morphemes.
    *
-   * For example, in Spanish, the verb "corro" might be stemmed as
+   * For example, in Spanish, the verb "apoyandolo" might be stemmed as
    *
    * ```
-   * [ ("corr", ...)
-   * ; ("o", ...)
+   * [ ("apoy", ...)
+   * ; ("ando", ...)
+   * ; ("lo", ...)
    * ]
    * ```
    * *)
