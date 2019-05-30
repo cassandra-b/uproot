@@ -19,4 +19,4 @@ let convert scheme = function
   | Rgb(s) -> s
 
 (* TODO: Define thru 9 colors. *)
-let default_scheme = [|"#D14EFF"; "#76EFF0"; "#FF94E8"; "#FBFB6B"; "#D00EB8"|]
+let default_scheme = [|"#D14EFF"; "#76EFF0"; "#FF94E8"; "#FBFB6B"; "#A02A2A"|]

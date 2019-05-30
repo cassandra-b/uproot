@@ -9,7 +9,7 @@ type t =
   }
 
 let default =
-  { border_color = Color.create "#A02A2A"
+  { border_color = Color.create "#D00EB8"
   ; border_width = 5.0
   ; definition_size = 2.0
   ; error_color = Color.create "#FF0000"
