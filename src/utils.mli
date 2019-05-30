@@ -1,6 +1,6 @@
 val (%) : ('b -> 'c) -> ('a -> 'b) -> 'a -> 'c
 
-exception NotInDict
+val id : 'a -> 'a
 
 val intersperse : 'a -> 'a list -> 'a list
 

@@ -2,7 +2,7 @@ external log : 'a -> unit = "log" [@@bs.val][@@bs.scope "console"]
 
 let (%) g f x = g (f x)
 
-exception NotInDict
+let id x = x
 
 let rec intersperse x = function
   | [] -> []
