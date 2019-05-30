@@ -1,3 +1,5 @@
+open Utils
+
 external addClass : Dom.domTokenList -> string -> unit = "add" [@@bs.send]
 external addEventListener : Dom.element -> string -> (unit -> unit) -> unit = "addEventListener" [@@bs.send]
 external appendChild : Dom.element -> Dom.element -> unit = "appendChild" [@@bs.send]
@@ -14,25 +16,14 @@ external setTextContent : Dom.element -> string -> unit = "textContent" [@@bs.se
 external setTitle : Dom.element -> string -> unit = "title" [@@bs.set]
 external toLowerCase : string -> string = "toLowerCase" [@@bs.send]
 
-type color
-  = LitColor of string
-  | Rgb of float * float * float
-let css_string_of_color = function
-  | LitColor(s) -> s
-  | Rgb(r, g, b) -> "rgb(" ^ Js.Float.toString (r *. 255.0) ^
-                       "," ^ Js.Float.toString (g *. 255.0) ^
-                       "," ^ Js.Float.toString (b *. 255.0) ^ ")"
-
-
 type layout = Horz | Vert
 let string_of_layout = function
   | Horz -> "horz"
   | Vert -> "vert"
 
+type color = string
 type size = float
-
 type width = float
-
 type help = string
 
 type component
@@ -48,7 +39,7 @@ let rec draw : component -> Dom.element = function
   | BorderBox(color, width, c) ->
       let ele = createElement "div" in
       let sty = getStyles ele in
-      setStyle sty "border-color" (css_string_of_color color);
+      setStyle sty "border-color" color;
       setStyle sty "border-style" "solid";
       setStyle sty "border-width" (Js.Float.toString width ^ "px");
       appendChild ele (draw c);
@@ -57,13 +48,13 @@ let rec draw : component -> Dom.element = function
       let ele = createElement "div" in
       addClass (getClassList ele) "box";
       addClass (getClassList ele) (string_of_layout layout);
-      List.iter (fun e -> appendChild ele (draw e)) cs;
+      List.iter (appendChild ele % draw) cs;
       ele
   | HelpText(color, size, text, altText) ->
       let ele = createElement "span" in
       addClass (getClassList ele) "help";
       let sty = getStyles ele in
-      setStyle sty "color" (css_string_of_color color);
+      setStyle sty "color" color;
       setStyle sty "font-size" (Js.Float.toString size ^ "em");
       setTextContent ele text;
       setTitle ele altText;
@@ -76,7 +67,7 @@ let rec draw : component -> Dom.element = function
   | Text(color, size, text) ->
       let ele = createElement "span" in
       let sty = getStyles ele in
-      setStyle sty "color" (css_string_of_color color);
+      setStyle sty "color" color;
       setStyle sty "font-size" (Js.Float.toString size ^ "em");
       setTextContent ele text;
       ele
@@ -93,13 +84,18 @@ let update (c: component) (ui: Dom.element) =
 
 
 
-let error (s: string) : component = Text(Rgb(1.0, 0.0, 0.0), 2.0, s)
+let error (s: string) : component = Text("#ff0000", 2.0, s)
 
-let ui_func : (string -> component) ref =
-  ref (fun _ -> error "No ui_func set!")
+let ui_func : (Theme.t -> string -> component) ref =
+  ref (fun _ _ -> error "No ui_func set!")
 
-let set_func (f: string -> component) : unit =
+let set_func (f: Theme.t -> string -> component) : unit =
   ui_func := f
+
+let theme : Theme.t ref = ref Theme.default
+
+let set_theme (t: Theme.t) : unit =
+  theme := t
 
 let () =
   match querySelector "#ui" with
@@ -108,7 +104,7 @@ let () =
       match querySelector "#text" with
       | Some ele -> addEventListener ele "change" (fun () ->
           let c = try
-            (!ui_func) (normalize (toLowerCase (getValue ele)) "NFC")
+            (!ui_func) (!theme) (normalize (toLowerCase (getValue ele)) "NFC")
           with
             | Failure(s) -> error s
             | Js.Exn.Error e ->

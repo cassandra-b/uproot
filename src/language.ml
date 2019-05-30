@@ -56,12 +56,12 @@ module Pirate : LANGUAGE = struct
   type morpheme = Arrr
 
   let stem_verb = function
-    | "Arrr" -> [("Arrr", Arrr)]
+    | "arrr" -> [("arrr", Arrr)]
     | _ -> []
 
   let morpheme_def Arrr = [Plain "Arrrn't you glad I didn't say orange"]
 
   let morpheme_color Arrr = Color.get 0
 
-  let translate _ = WordNotFound
+  let translate _ = LanguageNotSupported
 end

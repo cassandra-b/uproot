@@ -9,9 +9,14 @@ type scheme
  * color is used, an exception will be thrown. *)
 val get : int -> t
 
+(** Creates a color from a hex string. *)
+val create : string -> t
+
 (** The exception thrown when an undefined color is referred to. *)
 exception NoSuchColor
 
-(** Converts a color to red, green, and blue values, between 0 and 1. Throws an
- * exception if an undefined color is used. *)
-val convert_color : t -> scheme -> float * float * float
+(** Converts a color to an RGB hex string, e.g. "#7f00ff". *)
+val convert : scheme -> t -> string
+
+(** The default color scheme. *)
+val default_scheme : scheme

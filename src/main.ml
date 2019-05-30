@@ -1,6 +1,7 @@
-let (%) = Utils.(%)
+open Language
+open Renderer 
 
 let () =
   Printexc.record_backtrace true;
-  (* Ui.set_func (Rendering.render_morphemes % Parser.stem) *)
-  Ui.set_func (fun s -> Ui.Text(Ui.Rgb(0.0, 0.0, 0.0), 1.0, s))
+  let module R = Renderer(Pirate) in
+  Ui.set_func R.render_verb

@@ -1,13 +1,8 @@
-type color
-  = LitColor of string
-  | Rgb of float * float * float
-
 type layout = Horz | Vert
 
+type color = string
 type size = float
-
 type width = float
-
 type help = string
 
 type component
@@ -17,4 +12,5 @@ type component
   | Space of float
   | Text of color * size * string
 
-val set_func : (string -> component) -> unit
+val set_func : (Theme.t -> string -> component) -> unit
+val set_theme : Theme.t -> unit
