@@ -29,6 +29,9 @@ type translation_result
 module type LANGUAGE = sig
   type morpheme
 
+  (** The name of the language. *)
+  val name : string
+
   (** Breaks a verb up into morphemes.
    *
    * For example, in Spanish, the verb "apoyandolo" might be stemmed as
@@ -54,6 +57,8 @@ end
 
 module Pirate : LANGUAGE = struct
   type morpheme = Arrr
+
+  let name = "Pirate"
 
   let stem_verb = function
     | "arrr" -> [("arrr", Arrr)]

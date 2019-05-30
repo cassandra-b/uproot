@@ -4,6 +4,8 @@ module Spanish : LANGUAGE =
 struct
   type morpheme = Todo
 
+  let name = "Spanish"
+
   let stem_verb (verb:string) : (string * morpheme) list = Utils.todo ()
 
   let morpheme_def (morph:morpheme) : text_chunk list = Utils.todo ()
