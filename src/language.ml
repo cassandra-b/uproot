@@ -31,6 +31,7 @@ module type LANGUAGE = sig
 
   (** The name of the language. *)
   val name : string
+  val native_name : string
 
   (** Breaks a verb up into morphemes.
    *

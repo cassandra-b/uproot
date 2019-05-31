@@ -5,6 +5,7 @@ open Language
 module Spanish : LANGUAGE = 
 struct
 	let name = "Spanish"
+	let native_name = "Castellano"
 
 	type tense = 
     (* indicatives*)
@@ -213,8 +214,6 @@ struct
 		    | Aff -> "imperative"
 		    | Neg -> "negative imperative"
 
-
-
 		let lookupVerbDef (verb: string) : string = "GET RINGO TO ADD THE JAVASCRIPT"
 		(* takes in the infinitive form of the verb and returns the English translation *)
 		(* for regular verbs, the input to getVerbDef is just root^(string_of_arerir arerir)^reflexive *)
@@ -222,14 +221,12 @@ struct
 		let getObjectDesc (person: person) (gender:gender) : string =
     		(stringPerson person) ^ (stringGender gender) ^ "direct object pronoun"
 
-
 	let morpheme_def (morph:morpheme) : text_chunk list =
 		match morph with (* the root lookup in the dictionary currently only works on regular verbs *)
 		| Root(root) -> lookupVerbDef (root ^ )
-		| Conj(tense, plist, arerir) -> 
+		| Conj(tense, personList, arerir) -> 
     	| Object(person, gender) ->
 		| Reflexive -> "indicates the verb is reflexive"
-
 
 	let morpheme_color (morph:morpheme) : Color.t = 
 		match morph with
