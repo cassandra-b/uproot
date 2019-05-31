@@ -2,6 +2,7 @@
 Compound verb decomposition software
 
 # TODO
+choose an open-source license to use
 ## Spanish
 finish Spanish descriptions
 finish Spanish.findConjugation
