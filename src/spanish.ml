@@ -59,7 +59,7 @@ struct
 
 	type morpheme = 
 		| Root of string
-    	| Conj of (tense * (person list) * arerir)
+    	| Conj of (tense * (person list) * (arerir list))
     	| Object of (person * gender)
     	| Reflexive
 
@@ -126,13 +126,13 @@ struct
 											then parse_state
 										else begin
 											match String.sub verb (len-4) 4 with
-											| "ando" -> (("ando", Conj (Gerund, None, Ar))::soFar, (String.sub (snd parse_state) 0 (len-4))))
+											| "ando" -> (("ando", Conj (Gerund, None, Ar::[]))::soFar, (String.sub (snd parse_state) 0 (len-4))))
 											| 
 											| _ -> if (len < 5)
 													then parse_state
 												else begin
 													match String.sub verb (len-5) 5 with
-													|
+													| "iendo" -> (("iendo", Conj (Gerund, None, Er::Ir::[]))::soFar, (String.sub (snd parse_state) 0 (len-5))))
 													|
 													| _ -> if (len < 6)
 															then parse_state
@@ -153,7 +153,6 @@ struct
 				if (String.length root < 1) 
 					then soFar
 				else (root, Root (root))::soFar
-				
 
 	let stem_verb (verb:string) : (string * morpheme) list = 
 		let a = findReflexive verb in
@@ -214,19 +213,45 @@ struct
 		    | Aff -> "imperative"
 		    | Neg -> "negative imperative"
 
+		let tenseDesc (t:tense) : string = 
+		(* used for the hover-definition of the tense *)
+		    match t with
+		    | Inf -> "basic form of a verb, without inflection binding to a subject or tense,\ne.g. \"to swim\""
+		    | Present -> "form of a verb expressing an action that is current,\ne.g. \"I swim\""
+		    | Preterite -> " preterite"
+		    | Imperfect -> " imperfect"
+		    | Future -> " future"
+		    | Conditional -> " conditional"
+		    | Gerund -> "form of a verb that functions as noun,\ne.g. \"Swimming is fun\""
+		    | PluPerfect -> " pluscuam-perfect"
+		    | PresPerfect -> " present-perfect"
+		    | PretPerfect -> " preterite-perfect"
+		    | FuturePerfect -> " future-perfect"
+		    | PresSubj -> " subjunctive present"
+		    | PretSubj -> " subjunctive preterite"
+		    | ImperfectSubj -> " subjunctive imperfect"
+		    | FutureSubj -> " subjunctive future"
+		    | CondSubj -> " subjunctive conditional"
+		    | PluPerfectSubj -> " subjunctive pluscuam-perfect"
+		    | PresPerfSubj -> " subjunctive present-perfect" 
+		    | PretPerfSubj -> " subjunctive preterite-perfect"
+		    | FuturePerfSubj -> " subjunctive future-perfect"
+		    | Aff -> " imperative"
+		    | Neg -> " negative imperative"
+
 		let lookupVerbDef (verb: string) : string = "GET RINGO TO ADD THE JAVASCRIPT"
 		(* takes in the infinitive form of the verb and returns the English translation *)
 		(* for regular verbs, the input to getVerbDef is just root^(string_of_arerir arerir)^reflexive *)
 
-		let getObjectDesc (person: person) (gender:gender) : string =
-    		(stringPerson person) ^ (stringGender gender) ^ "direct object pronoun"
-
 	let morpheme_def (morph:morpheme) : text_chunk list =
 		match morph with (* the root lookup in the dictionary currently only works on regular verbs *)
-		| Root(root) -> lookupVerbDef (root ^ )
-		| Conj(tense, personList, arerir) -> 
-    	| Object(person, gender) ->
-		| Reflexive -> "indicates the verb is reflexive"
+		| Root(root) -> lookupVerbDef (root ^ string_of_arerir )
+					(* need to try all members of the arerir list *)
+		| Conj(tense, people, arerir) -> 
+			(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir arerir) ^ " verbs"))::[]
+    	| Object(person, gender) -> 
+    		(Plain (stringPerson person))::(Plain (stringGender gender))::(Plain "direct object pronoun")::[]
+		| Reflexive -> (Plain "indicates the verb is reflexive")::[]
 
 	let morpheme_color (morph:morpheme) : Color.t = 
 		match morph with

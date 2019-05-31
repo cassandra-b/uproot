@@ -20,7 +20,7 @@ struct
 		| PPerfect (* me- tense, present perfect on passive verbs and past perfect on active verbs *)
 		| Habitual
 		| NotYet (* ja- tense, always negative *)
-
+		(* ADD MORE TENSES *)
 
 	type negative = bool (* false by default, tru if a negative is present *)
 	type active = bool (* false if it is a passive verb *)
