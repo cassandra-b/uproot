@@ -1,3 +1,4 @@
+#use "color.ml";;
 (** A chunk of text to be shown in a line in the UI.
  *
  * To allow adding definitions to some parts of a sentence, `text_chunk list`s

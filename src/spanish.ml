@@ -1,6 +1,7 @@
-external rawData : (string * string) Js.Array.t = "rawData" [@@bs.val][@@bs.scope "window"]
-
-open Language
+(* external rawData : (string * string) Js.Array.t = "rawData" [@@bs.val][@@bs.scope "window"]
+ *)
+(* open Language *)
+#use "language.ml";;
 
 module Spanish : LANGUAGE = 
 struct
@@ -58,7 +59,7 @@ struct
 	type reflexive = bool
 
 	type morpheme = 
-		| Root of string
+		| Root of string * (arerir list) * reflexive (* list of possible endings *)
     	| Conj of (tense * (person list) * (arerir list))
     	| Object of (person * gender)
     	| Reflexive
@@ -67,15 +68,15 @@ struct
 
     (* STEM_VERB HELPER FUNCTIONS *)
 
-    	let findReflexive (verb:string) : parsing = 
+    	let findReflexive (verb:string) : parsing * bool = 
     	(* takes in a verb and checks last two letters for a "se" *)
 		(* returns the list of morphemes identified so far and the string left to be parsed *)
 			let len = String.length verb in
 				if (len < 3)
-					then ([], verb)
+					then (([], verb), false)
 				else match String.sub verb (len-2) 2 with
-					| "se" -> (("se", Reflexive)::[], (String.sub verb 0 (len-2)))
-					| _ -> ([], verb)
+					| "se" -> ((("se", Reflexive)::[], (String.sub verb 0 (len-2))), true)
+					| _ -> (([], verb), false)
 
 		let findObject (parse_state:parsing) : parsing =
 		(* takes in a verb and checks last two/three letters for an object *)
@@ -84,28 +85,29 @@ struct
 				if (len < 3) 
 					then parse_state
 				else match String.sub (snd parse_state) (len-2) 2 with
-					| "lo" -> ((("lo", Object (Third, Male))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
-					| "la" -> ((("la", Object (Third, Female))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
+					| "lo" -> ((("lo", Object (Third, Masc))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
+					| "la" -> ((("la", Object (Third, Fem))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| "le" -> ((("le", Object (Third, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| "me" -> ((("me", Object (First, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| "te" -> ((("te", Object (Second, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| "os" -> ((("os", Object (SecondPlural, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| _ -> begin
 							match String.sub (snd parse_state) (len-3) 3 with
-							| "los" -> ((("los", Object (ThirdPlural, Male))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
-							| "las" -> ((("las", Object (ThirdPlural, Female))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
+							| "los" -> ((("los", Object (ThirdPlural, Masc))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
+							| "las" -> ((("las", Object (ThirdPlural, Fem))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
 							| "les" -> ((("les", Object (ThirdPlural, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
 							| "nos" -> ((("nos", Object (FirstPlural, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
 							| _ -> parse_state
 						end
 
-		let findConjugation (parse_state:parsing) : parsing =
+		let findConjugation (parse_state:parsing) : parsing * (arerir list) =
 		(* takes in a verb and checks last few letters for specific conjugations *)
 		(* returns the list of morphemes identified so far and the string left to be parsed *)
 			let verb = snd parse_state in
 			let soFar = fst parse_state in
 			let len = String.length verb in
-				if (len < 1) 
+			((("imos", Conj (Present, FirstPlural::[], Er::Ir::[]))::soFar, verb), Er::Ir::[])
+(* 				if (len < 1) 
 					then parse_state
 				else match verb with
 					| _ -> if (len < 2)
@@ -135,20 +137,21 @@ struct
 													end
 											end
 									end
-							end
+							end *)
 
-		let findRoot (parse_state:parsing) : (string * morpheme) list =
+		let findRoot (parse_state:parsing) (aeis:arerir list) (reflex:reflexive): (string * morpheme) list =
 			let root = snd parse_state in
 			let soFar = fst parse_state in
 				if (String.length root < 1) 
 					then soFar
-				else (root, Root (root))::soFar
+				else (root, Root (root, aeis, reflex))::soFar
 
 	let stem_verb (verb:string) : (string * morpheme) list = 
 		let a = findReflexive verb in
-		let b = findObject a in
+		let b = findObject (fst a) in
 		let c = findConjugation b in
-				findRoot c
+		let arerirs = snd c in
+				findRoot (fst c) arerirs (snd a)
 
 	(* MORPHEME DESCRIPTION HELPER FUNCTIONS *)
 		let string_of_arerir (arerir: arerir) : string = 
@@ -242,8 +245,8 @@ struct
 			| [] -> []
 			| _ -> "input to Spanish.morpheme_def.compose not recognized"::[]
 		in match morph with (* the root lookup in the dictionary currently only works on regular verbs *)
-			| Root(root) -> lookupVerbDef (compose root (* need more here *) )
-						(* need to try all members of the arerir list *)
+			| Root(root, arerir, reflex) -> lookupVerbDef (compose root arerir reflex)
+				(* cycle thru and find string instead of string list *)
 			| Conj(tense, people, arerir) -> 
 				(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir arerir) ^ " verbs"))::[]
 	    	| Object(person, gender) -> 
@@ -252,7 +255,7 @@ struct
 
 	let morpheme_color (morph:morpheme) : Color.t = 
 		match morph with
-		| Root(_) -> Color.get 0
+		| Root(_,_,_) -> Color.get 0
 		| Conj(_,_,_) -> Color.get 1
 		| Object(_,_) -> Color.get 2
 		| Reflexive -> Color.get 3
