@@ -108,38 +108,28 @@ struct
 				if (len < 1) 
 					then parse_state
 				else match verb with
-					|
-					|
 					| _ -> if (len < 2)
 							then parse_state
 						else begin
 							match String.sub verb (len-2) 2 with
-							|
-							|
 							| _ -> if (len < 3)
 									then parse_state
 								else begin
 									match String.sub verb (len-3) 3 with
-									|
-									|
 									| _ -> if (len < 4)
 											then parse_state
 										else begin
 											match String.sub verb (len-4) 4 with
 											| "ando" -> (("ando", Conj (Gerund, None, Ar::[]))::soFar, (String.sub (snd parse_state) 0 (len-4))))
-											| 
 											| _ -> if (len < 5)
 													then parse_state
 												else begin
 													match String.sub verb (len-5) 5 with
 													| "iendo" -> (("iendo", Conj (Gerund, None, Er::Ir::[]))::soFar, (String.sub (snd parse_state) 0 (len-5))))
-													|
 													| _ -> if (len < 6)
 															then parse_state
 														else begin
 															match String.sub verb (len-6) 6 with
-															|
-															|
 															| _ -> parse_state
 															end
 													end
@@ -244,14 +234,21 @@ struct
 		(* for regular verbs, the input to getVerbDef is just root^(string_of_arerir arerir)^reflexive *)
 
 	let morpheme_def (morph:morpheme) : text_chunk list =
-		match morph with (* the root lookup in the dictionary currently only works on regular verbs *)
-		| Root(root) -> lookupVerbDef (root ^ string_of_arerir )
-					(* need to try all members of the arerir list *)
-		| Conj(tense, people, arerir) -> 
-			(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir arerir) ^ " verbs"))::[]
-    	| Object(person, gender) -> 
-    		(Plain (stringPerson person))::(Plain (stringGender gender))::(Plain "direct object pronoun")::[]
-		| Reflexive -> (Plain "indicates the verb is reflexive")::[]
+		let compose (root:string) (aeilst:arerir list) (reflex:reflexive): string list = 
+			match aeilst with
+			| hd::[] -> (root ^ string_of_arerir hd ^ (if reflex then "se" else ""))::[]
+			| hd::tl::[] -> (root ^ string_of_arerir hd ^ (if reflex then "se" else ""))::(root ^ string_of_arerir tl ^ (if reflex then "se" else ""))::[]
+			| hd::nk::tl::[] -> (root ^ string_of_arerir hd ^ (if reflex then "se" else ""))::(root ^ string_of_arerir nk ^ (if reflex then "se" else ""))::(root ^ string_of_arerir tl ^ (if reflex then "se" else ""))::[]
+			| [] -> []
+			| _ -> "input to Spanish.morpheme_def.compose not recognized"::[]
+		in match morph with (* the root lookup in the dictionary currently only works on regular verbs *)
+			| Root(root) -> lookupVerbDef (compose root (* need more here *) )
+						(* need to try all members of the arerir list *)
+			| Conj(tense, people, arerir) -> 
+				(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir arerir) ^ " verbs"))::[]
+	    	| Object(person, gender) -> 
+	    		(Plain (stringPerson person))::(Plain (stringGender gender))::(Plain "direct object pronoun")::[]
+			| Reflexive -> (Plain "indicates the verb is reflexive")::[]
 
 	let morpheme_color (morph:morpheme) : Color.t = 
 		match morph with
