@@ -60,6 +60,7 @@ module Pirate : LANGUAGE = struct
   type morpheme = Arrr
 
   let name = "Pirate"
+  let native_name = "Arrr"
 
   let stem_verb = function
     | "arrr" -> [("arrr", Arrr)]

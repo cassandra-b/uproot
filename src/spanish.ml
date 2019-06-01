@@ -1,4 +1,4 @@
-external rawData : (string * string) Js.Array.t = "rawData" [@@bs.val][@@bs.scope "window"]
+external spanish_data : (string * string) Js.Array.t = "./spanish_data.json" [@@bs.module]
 
 open Language
 
@@ -84,16 +84,16 @@ struct
 				if (len < 3) 
 					then parse_state
 				else match String.sub (snd parse_state) (len-2) 2 with
-					| "lo" -> ((("lo", Object (Third, Male))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
-					| "la" -> ((("la", Object (Third, Female))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
+					| "lo" -> ((("lo", Object (Third, Masc))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
+					| "la" -> ((("la", Object (Third, Fem))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| "le" -> ((("le", Object (Third, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| "me" -> ((("me", Object (First, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| "te" -> ((("te", Object (Second, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| "os" -> ((("os", Object (SecondPlural, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-2))))
 					| _ -> begin
 							match String.sub (snd parse_state) (len-3) 3 with
-							| "los" -> ((("los", Object (ThirdPlural, Male))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
-							| "las" -> ((("las", Object (ThirdPlural, Female))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
+							| "los" -> ((("los", Object (ThirdPlural, Masc))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
+							| "las" -> ((("las", Object (ThirdPlural, Fem))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
 							| "les" -> ((("les", Object (ThirdPlural, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
 							| "nos" -> ((("nos", Object (FirstPlural, Neutral))::(fst parse_state), (String.sub (snd parse_state) 0 (len-3))))
 							| _ -> parse_state
@@ -120,12 +120,12 @@ struct
 											then parse_state
 										else begin
 											match String.sub verb (len-4) 4 with
-											| "ando" -> (("ando", Conj (Gerund, None, Ar::[]))::soFar, (String.sub (snd parse_state) 0 (len-4))))
+                                            | "ando" -> (("ando", Conj (Gerund, [], Ar::[]))::soFar, (String.sub (snd parse_state) 0 (len-4)))
 											| _ -> if (len < 5)
 													then parse_state
 												else begin
 													match String.sub verb (len-5) 5 with
-													| "iendo" -> (("iendo", Conj (Gerund, None, Er::Ir::[]))::soFar, (String.sub (snd parse_state) 0 (len-5))))
+                                                    | "iendo" -> (("iendo", Conj (Gerund, [], Er::Ir::[]))::soFar, (String.sub (snd parse_state) 0 (len-5)))
 													| _ -> if (len < 6)
 															then parse_state
 														else begin
@@ -229,9 +229,14 @@ struct
 		    | Aff -> " imperative"
 		    | Neg -> " negative imperative"
 
-		let lookupVerbDef (verb: string) : string = "GET RINGO TO ADD THE JAVASCRIPT"
-		(* takes in the infinitive form of the verb and returns the English translation *)
-		(* for regular verbs, the input to getVerbDef is just root^(string_of_arerir arerir)^reflexive *)
+		(** takes in the infinitive form of the verb and returns the English translation
+         *
+         * for regular verbs, the input to getVerbDef is just
+         * root^(string_of_arerir arerir)^reflexive
+         * *)
+		let lookupVerbDef (verb: string) : string option =
+            Js.Array.find (fun (key, _) -> key = verb) spanish_data
+            |> Utils.option_map snd
 
 	let morpheme_def (morph:morpheme) : text_chunk list =
 		let compose (root:string) (aeilst:arerir list) (reflex:reflexive): string list = 
@@ -242,10 +247,10 @@ struct
 			| [] -> []
 			| _ -> "input to Spanish.morpheme_def.compose not recognized"::[]
 		in match morph with (* the root lookup in the dictionary currently only works on regular verbs *)
-			| Root(root) -> lookupVerbDef (compose root (* need more here *) )
+			| Root(root) -> Utils.todo () (* lookupVerbDef (compose root (* need more here *) ) *)
 						(* need to try all members of the arerir list *)
 			| Conj(tense, people, arerir) -> 
-				(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir arerir) ^ " verbs"))::[]
+				(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir ((Utils.todo ()) arerir)) ^ " verbs"))::[]
 	    	| Object(person, gender) -> 
 	    		(Plain (stringPerson person))::(Plain (stringGender gender))::(Plain "direct object pronoun")::[]
 			| Reflexive -> (Plain "indicates the verb is reflexive")::[]

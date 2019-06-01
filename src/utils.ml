@@ -11,5 +11,9 @@ let rec intersperse x = function
 
 let log' x = log x; x
 
+let option_map f = function
+  | Some(x) -> Some(f x)
+  | None -> None
+
 let todo () =
   Js.Exn.raiseError "TODO"
