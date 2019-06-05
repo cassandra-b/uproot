@@ -263,7 +263,7 @@ struct
 		  				| hd::[] -> " -" ^ (string_of_arerir hd)
 		  				| hd::tl -> " -" ^ (string_of_arerir hd) ^ " and"
 		  				| [] -> ""
-		  			in (Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of" ^ (compOr arerir)) ^ " verbs"))::[]
+		  			in (Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of" ^ (compOr arerir)) ^ " verbs")::[]
 		  		end
 	    	| Object(person, gender) -> 
 	    		(Plain (stringPerson person))::(Plain (stringGender gender))::(Plain "direct object pronoun")::[]
