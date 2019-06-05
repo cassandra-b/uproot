@@ -22,13 +22,14 @@ let string_of_layout = function
   | Vert -> "vert"
 
 type color = string
+type flex = bool
 type size = float
 type width = float
 type help = string
 
 type component
   = BorderBox of color * width * component
-  | Box of layout * component list
+  | Box of layout * flex * component list
   | HelpText of color * size * string * help
   | Space of float
   | Text of color * size * string
@@ -44,8 +45,10 @@ let rec draw : component -> Dom.element = function
       setStyle sty "border-width" (Js.Float.toString width ^ "px");
       appendChild ele (draw c);
       ele
-  | Box(layout, cs) ->
+  | Box(layout, flex, cs) ->
       let ele = createElement "div" in
+      if flex then
+        addClass (getClassList ele) "flex";
       addClass (getClassList ele) "box";
       addClass (getClassList ele) (string_of_layout layout);
       List.iter (appendChild ele % draw) cs;
@@ -113,7 +116,7 @@ let () =
               | None -> error "An unknown error occurred"
               in begin
                 match Js.Exn.stack e with
-                | Some stack -> Box(Vert, [msg; error stack])
+                | Some stack -> Box(Vert, true, [msg; error stack])
                 | None -> msg
               end
             | exc -> error (Printexc.to_string exc)

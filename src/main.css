@@ -24,7 +24,7 @@ main {
 }
 #ui { margin-top: 2vh; }
 
-.box { display: flex; }
+.box.flex { display: flex; }
 .box.horz { flex-direction: row; padding: 0px 8px; }
 .box.vert { flex-direction: column; }
 

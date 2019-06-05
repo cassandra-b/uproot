@@ -21,10 +21,12 @@ end = struct
       | Plain(s) -> Text(color, theme.definition_size, s)
       | WithDef(s, help) -> HelpText(color, theme.definition_size, s, help)
     in
-    Box(Horz,
+    let parts =
       [ Text(color, theme.definition_size, "\"" ^ str ^ "\" -")
       ; Space(theme.definition_size)
-      ] @ List.map component_of_text_chunk (Language.morpheme_def morpheme))
+      ] @ List.map component_of_text_chunk (Language.morpheme_def morpheme)
+    in
+    Box(Horz, false, intersperse (Space(theme.definition_size)) parts)
 
   let render_morphemes (theme: Theme.t) : (string * morpheme) list -> component =
     let convert_color = Color.convert theme.morpheme_colors in function
@@ -34,7 +36,7 @@ end = struct
       let bordered c = BorderBox(border_color, theme.border_width, c) in
 
       let morphemes_components = List.map (render_morpheme theme) morphemes in
-      let morphemes_component = bordered (Box(Horz, morphemes_components)) in
+      let morphemes_component = bordered (Box(Horz, true, morphemes_components)) in
 
       let definition_components = List.map (render_definition theme) morphemes in
 
@@ -44,11 +46,11 @@ end = struct
         | WordNotFound -> [(theme.error_color, "Word not found")])
         |> List.map (fun (c, s) -> Text(convert_color c, theme.translation_size, s))
         |> intersperse (Space(theme.translation_size))
-        |> (fun cs -> Box(Horz, cs))
+        |> (fun cs -> Box(Horz, true, cs))
         |> bordered
       in
 
-      Box(Vert, morphemes_component::definition_components@[translation_component])
+      Box(Vert, true, morphemes_component::definition_components@[translation_component])
 
   let render_verb (theme: Theme.t) : string -> component =
     render_morphemes theme % Language.stem_verb
