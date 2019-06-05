@@ -257,7 +257,14 @@ struct
 				    (* cycle thru and find string instead of string list *)
                 end
 			| Conj(tense, people, arerir) -> 
-				(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir ((Utils.todo ()) arerir)) ^ " verbs"))::[]
+				begin
+	    			let compOr (lst:arerir list) : string =
+		  				match lst with
+		  				| hd::[] -> " -" ^ (string_of_arerir hd)
+		  				| hd::tl -> " -" ^ (string_of_arerir hd) ^ " and"
+		  				| [] -> ""
+		  			in (Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of" ^ (compOr arerir)) ^ " verbs"))::[]
+		  		end
 	    	| Object(person, gender) -> 
 	    		(Plain (stringPerson person))::(Plain (stringGender gender))::(Plain "direct object pronoun")::[]
 			| Reflexive -> (Plain "indicates the verb is reflexive")::[]
