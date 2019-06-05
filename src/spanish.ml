@@ -1,7 +1,6 @@
-(* external rawData : (string * string) Js.Array.t = "rawData" [@@bs.val][@@bs.scope "window"]
- *)
-(* open Language *)
-#use "language.ml";;
+external spanish_data : (string * string) Js.Array.t = "./spanish_data.json" [@@bs.module]
+
+open Language
 
 module Spanish : LANGUAGE = 
 struct
@@ -122,12 +121,12 @@ struct
 											then parse_state
 										else begin
 											match String.sub verb (len-4) 4 with
-											| "ando" -> (("ando", Conj (Gerund, None, Ar::[]))::soFar, (String.sub (snd parse_state) 0 (len-4))))
+                                            | "ando" -> (("ando", Conj (Gerund, [], Ar::[]))::soFar, (String.sub (snd parse_state) 0 (len-4)))
 											| _ -> if (len < 5)
 													then parse_state
 												else begin
 													match String.sub verb (len-5) 5 with
-													| "iendo" -> (("iendo", Conj (Gerund, None, Er::Ir::[]))::soFar, (String.sub (snd parse_state) 0 (len-5))))
+                                                    | "iendo" -> (("iendo", Conj (Gerund, [], Er::Ir::[]))::soFar, (String.sub (snd parse_state) 0 (len-5)))
 													| _ -> if (len < 6)
 															then parse_state
 														else begin
@@ -232,9 +231,14 @@ struct
 		    | Aff -> " imperative"
 		    | Neg -> " negative imperative"
 
-		let lookupVerbDef (verb: string) : string = "GET RINGO TO ADD THE JAVASCRIPT"
-		(* takes in the infinitive form of the verb and returns the English translation *)
-		(* for regular verbs, the input to getVerbDef is just root^(string_of_arerir arerir)^reflexive *)
+		(** takes in the infinitive form of the verb and returns the English translation
+         *
+         * for regular verbs, the input to getVerbDef is just
+         * root^(string_of_arerir arerir)^reflexive
+         * *)
+		let lookupVerbDef (verb: string) : string option =
+            Js.Array.find (fun (key, _) -> key = verb) spanish_data
+            |> Utils.option_map snd
 
 	let morpheme_def (morph:morpheme) : text_chunk list =
 		let compose (root:string) (aeilst:arerir list) (reflex:reflexive): string list = 
@@ -245,10 +249,15 @@ struct
 			| [] -> []
 			| _ -> "input to Spanish.morpheme_def.compose not recognized"::[]
 		in match morph with (* the root lookup in the dictionary currently only works on regular verbs *)
-			| Root(root, arerir, reflex) -> lookupVerbDef (compose root arerir reflex)
-				(* cycle thru and find string instead of string list *)
+			| Root(root, arerir, reflex) ->
+                begin
+                    match Utils.first_some lookupVerbDef (compose root arerir reflex) with
+                    | Some(x) -> [Plain x]
+                    | None -> []
+				    (* cycle thru and find string instead of string list *)
+                end
 			| Conj(tense, people, arerir) -> 
-				(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir arerir) ^ " verbs"))::[]
+				(Plain (stringPeople people))::(WithDef ((stringTense tense), (tenseDesc tense)))::(Plain (" form of -" ^ (string_of_arerir ((Utils.todo ()) arerir)) ^ " verbs"))::[]
 	    	| Object(person, gender) -> 
 	    		(Plain (stringPerson person))::(Plain (stringGender gender))::(Plain "direct object pronoun")::[]
 			| Reflexive -> (Plain "indicates the verb is reflexive")::[]

@@ -31,16 +31,19 @@ struct
 		| Tense of tense (* there may be no tense, in which case it is an imperative command *)
 		| Root of string * active
 
-	let stem_verb (verb:string) : (string * morpheme) list = 
+	let stem_verb (verb:string) : (string * morpheme) list = Utils.todo ()
 	
 	let morpheme_def (morph:morpheme) : text_chunk list = (Plain (""))::[]
 
 	let morpheme_color (morph:morpheme) : Color.t = 
+        (*
 		match morph with
 		|  -> Color.get 0
 		|  -> Color.get 1
 		|  -> Color.get 2
 		|  -> Color.get 3
+        *)
+        Utils.todo ()
 
 	let translate (parseList:(string * morpheme) list) : translation_result = LanguageNotSupported
 
