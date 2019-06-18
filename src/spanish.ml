@@ -8,33 +8,36 @@ struct
 	let native_name = "Castellano"
 
 	type tense = 
-    (* indicatives*)
-        | Inf 
-        | Present 
-        | Preterite 
-        | Imperfect 
-        | Future 
-        | Conditional 
-        | Gerund 
-        (* perfect *)
-        | PluPerfect 
-        | PresPerfect 
-        | PretPerfect 
-        | FuturePerfect 
-    (* subjunctives *)
-        | PresSubj 
-        | PretSubj 
-        | ImperfectSubj 
-        | FutureSubj 
-        | CondSubj 
-        (* perfect *)
-        | PluPerfectSubj 
-        | PresPerfSubj 
-        | PretPerfSubj 
-        | FuturePerfSubj
-    (* imperatives *)
+	(* "big fourteen" *)
+	    (* indicatives *)
+	        | Present 
+	        | Preterite 
+	        | Imperfect 
+	        | Future 
+	        | Conditional 
+	        (* perfect *)
+	        | PluPerfect 
+	        | PresPerfect 
+	        | PretPerfect 
+	        | FuturePerfect 
+	    (* subjunctives *)
+	        | PresSubj 
+	        | PretSubj 
+	        | ImperfectSubj 
+	        | FutureSubj 
+	        | CondSubj 
+	        (* perfect *)
+	        | PluPerfectSubj 
+	        | PresPerfSubj 
+	        | PretPerfSubj 
+	        | FuturePerfSubj
+    (* imperatives (commands) *)
         | Aff
         | Neg
+    (* non-verb forms *)
+	    | Inf (* e.g. "-ar"/"-er"/"-ir" *)
+		| Gerund (* functions as a noun or adjective, e.g. "-ando"/"-iendo" *)
+		| Participle (* functions as an adjective, e.g. "-ado"/"-ido"  *)
 
 	type person = 
 	    | First
@@ -182,13 +185,11 @@ struct
 
 		let stringTense (t:tense) : string =
 		    match t with
-		    | Inf -> "infinitive"
 		    | Present -> "present"
 		    | Preterite -> "preterite"
 		    | Imperfect -> "imperfect"
 		    | Future -> "future"
 		    | Conditional -> "conditional"
-		    | Gerund -> "gerund"
 		    | PluPerfect -> "pluscuam-perfect"
 		    | PresPerfect -> "present-perfect"
 		    | PretPerfect -> "preterite-perfect"
@@ -204,17 +205,19 @@ struct
 		    | FuturePerfSubj -> "subjunctive future-perfect"
 		    | Aff -> "imperative"
 		    | Neg -> "negative imperative"
+		    | Inf -> "infinitive"
+		    | Gerund -> "gerund or present participle"
+		    | Participle -> "past participle"
+
 
 		let tenseDesc (t:tense) : string = 
 		(* used for the hover-definition of the tense *)
 		    match t with
-		    | Inf -> "basic form of a verb, without inflection binding to a subject or tense,\ne.g. \"to swim\""
 		    | Present -> "form of a verb expressing an action that is current,\ne.g. \"I swim\""
 		    | Preterite -> " preterite"
 		    | Imperfect -> " imperfect"
 		    | Future -> " future"
 		    | Conditional -> " conditional"
-		    | Gerund -> "form of a verb that functions as noun,\ne.g. \"Swimming is fun\""
 		    | PluPerfect -> " pluscuam-perfect"
 		    | PresPerfect -> " present-perfect"
 		    | PretPerfect -> " preterite-perfect"
@@ -228,8 +231,11 @@ struct
 		    | PresPerfSubj -> " subjunctive present-perfect" 
 		    | PretPerfSubj -> " subjunctive preterite-perfect"
 		    | FuturePerfSubj -> " subjunctive future-perfect"
-		    | Aff -> " imperative"
-		    | Neg -> " negative imperative"
+		    | Aff -> "form of a verb that functions as a command, \ne.g. \"Stop!\""
+		    | Neg -> "form of a verb that functions as a negated command, \ne.g. \"Don't stop!\""
+		    | Inf -> "basic form of a verb, without inflection binding to a subject or tense,\ne.g. \"to swim\""
+		    | Gerund -> "form of a verb that functions as a noun or adjective,\ne.g. \"Swimming is fun\" or \"The swimming dog\""
+		    | Participle -> "form of a verb that functions as an adjective, \ne.g. \"The broken plate\""
 
 		(** takes in the infinitive form of the verb and returns the English translation
          *
