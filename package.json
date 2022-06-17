@@ -10,7 +10,7 @@
   "devDependencies": {
     "bs-platform": "^5.0.4",
     "bsb-js": "^1.1.7",
-    "electron": "^5.0.2",
+    "electron": "^15.5.5",
     "parcel-bundler": "^1.12.3"
   }
 }
